@@ -6,7 +6,7 @@ const TABLE_NAME='cdr' \
 let CDR_DIR='C:\\Users\\Alex\\Pictures\\cdr-import\\' \
 let ARCHIVE_DIR='C:\\Users\\Alex\\Pictures\\cdr-import\\arch\\' \
 const sqlConfig = { \
-    user: 'sa', \ 
-    password: '12345', \ 
-    database: 'testdb', \
+    user: 'sa', 
+    password: '12345', 
+    database: 'testdb', 
     server: '127.0.0.1',
