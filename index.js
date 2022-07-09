@@ -5,7 +5,7 @@ var path = require('path');
 const { dirname } = require('path');
 const logger = require('logger').createLogger('cdrService.log');
 logger.setLevel('debug');
-const DBNAME='cdr'
+const TABLE_NAME='cdr'
 let CDR_DIR='C:\\Users\\Alex\\Pictures\\cdr-import\\'
 let ARCHIVE_DIR='C:\\Users\\Alex\\Pictures\\cdr-import\\arch\\'
 const sqlConfig = {
@@ -70,7 +70,7 @@ const sqlConfig = {
          origSpan=arr[6]
          origIpAddr=arr[7]
          callingPartyNumber=arr[8]
-         let query=`insert into ${DBNAME}   values (${cdrRecordType},${globalCallID_callManagerId},${globalCallID_callId},${origLegCallIdentifier}, ${dateTimeOrigination},${origNodeId},${origSpan},${origIpAddr},${callingPartyNumber})`
+         let query=`insert into ${TABLE_NAME}   values (${cdrRecordType},${globalCallID_callManagerId},${globalCallID_callId},${origLegCallIdentifier}, ${dateTimeOrigination},${origNodeId},${origSpan},${origIpAddr},${callingPartyNumber})`
         //console.log(query)
         let insertRow= async function(query) {
          try {
