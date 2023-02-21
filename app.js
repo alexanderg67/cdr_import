@@ -18,7 +18,7 @@ const sqlConfig = {                                            //sql connection 
   },
   options: {
       encrypt: false, // for azure
-      trustServerCertificate: true // change to true for local dev / self-signed certs
+      trustServerCertificate: true // change to true for local dev / self-signed certificates
     } }
 async function main() {
   
