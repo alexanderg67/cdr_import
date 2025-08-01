@@ -3,36 +3,23 @@ const schedule = require('node-schedule');
 const nReadlines = require('n-readlines');
 const sql = require('mssql')
 const fs = require('fs')
-const CDR_DIR='C:\\Users\\Alex\\Pictures\\testnode\\'            //full path to cdr folder
-const ARCHIVE_DIR='C:\\Users\\Alex\\Pictures\\testnode\\arch\\'  //full path to archive folder
-const sqlTable='cdrowrk'                                       //table name for cdr
-const sqlConfig = {                                            //sql connection hostname, login,password
-  user: 'sa',
-  password: '12345',
-  database: 'testdb',
-  server: '127.0.0.1',
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
-  options: {
-      encrypt: false, // for azure
-      trustServerCertificate: true // change to true for local dev / self-signed certificates
-    } }
+const config=require('./config.json')
+
+
 async function main() {
   
   try {
-    await sql.connect(sqlConfig) 
-    await sql.query(`select top 1 * from  ${sqlTable} ` ) // test sql connection by query
+     
+    await sql.connect(config.sqlConfig) 
+    await sql.query(`select top 1 * from  ${config.sqlTable} ` ) // test sql connection by query
     console.log(new Date().toString().slice(0,24) +' Start.Connected to SQL')
     let filesOlder=[];  // array stores list of cdr files modified 30 seconds ago
-    const dirArray=fs.readdirSync(CDR_DIR).filter ( filename =>  {
+    const dirArray=fs.readdirSync(config.CDR_DIR).filter ( filename =>  {
         return  filename.startsWith("cdr_")  
       } )
      
     dirArray.forEach( file => {
-        const isOlder=fs.statSync(CDR_DIR+file).mtimeMs  < Date.now() - 30000
+        const isOlder=fs.statSync(config.CDR_DIR+file).mtimeMs  < Date.now() - 30000
         if (isOlder)
         filesOlder.push(file)
     })
@@ -44,7 +31,7 @@ filesOlder.length=30   //Every run we take only 30 files to handle
  
 for ( let filename of filesOlder ) {
 console.log(new Date().toString().slice(0,24)+` Opening file ${filename}:`)
-const broadbandLines = new nReadlines(CDR_DIR+filename);
+const broadbandLines = new nReadlines(config.CDR_DIR+filename);
 const insert=async ( arr) => {
   try {
     let dateTimeOrigination,dateTimeConnect,dateTimeDisconnect
@@ -71,7 +58,7 @@ const insert=async ( arr) => {
   }
  
   
-       let query=`insert into ${sqlTable} VALUES ( ${arr[0]},${arr[1]},${arr[2]},${arr[3]},${arr[4]},${arr[5]},${arr[6]},${arr[7]},
+       let query=`insert into ${config.sqlTable} VALUES ( ${arr[0]},${arr[1]},${arr[2]},${arr[3]},${arr[4]},${arr[5]},${arr[6]},${arr[7]},
         ${arr[8]},${arr[9]},${arr[10]},${arr[11]},${arr[12]},${arr[13]},${arr[14]},${arr[15]},${arr[16]},${arr[17]},${arr[18]},${arr[19]},
         ${arr[20]},${arr[21]},${arr[22]},${arr[23]},${arr[24]},${arr[25]},${arr[26]},${arr[27]},${arr[28]},${arr[29]},${arr[30]},${arr[31]},
         ${arr[32]},${arr[33]},${arr[34]},${arr[35]},${arr[36]},${arr[37]},${arr[38]},${arr[39]},${arr[40]},${arr[41]},${arr[42]},${arr[43]},
@@ -118,7 +105,7 @@ await new Promise(resolve => setTimeout(resolve, 800));  //Timeout after one fil
       if (filesOlder.length >0)
       console.log(new Date().toString().slice(0,24)+ ' Moving files to archive folder:') 
       filesOlder.forEach( filename => { 
-        fs.rename(CDR_DIR+filename, ARCHIVE_DIR+filename , function (err) {
+        fs.rename(config.CDR_DIR+filename, config.ARCHIVE_DIR+filename , function (err) {
           if (err) {
             console.log(new Date().toString().slice(0,24)+ ` Error moving file ${filename}`);
              
